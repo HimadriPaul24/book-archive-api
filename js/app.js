@@ -1,7 +1,5 @@
-const result = document.getElementById('result');
-const searchResult = document.getElementById('search-result');
-
-
+let result = document.getElementById('result');
+let searchResult = document.getElementById('search-result');
 
 const searchBook = () => {
     const searchField = document.getElementById('search-field');
@@ -10,6 +8,7 @@ const searchBook = () => {
 
     //clear data
     searchField.value = '';
+
 
 
 
@@ -25,8 +24,8 @@ const searchBook = () => {
 
         fetch(url)
             .then(res => res.json())
-            // .then(data => console.log(data.docs))
-            .then(data => displaySearchResult(data.docs));
+            // .then(data => console.log(data.books))
+            .then(data => displaySearchResult(data));
 
 
     }
@@ -34,36 +33,42 @@ const searchBook = () => {
 
 
 //showing search result 
-const displaySearchResult = docs => {
-    docs = docs.filter(element => element.author_name !== undefined || element.publisher !== undefined || element.first_publish_year !== undefined || element.cover_i !== undefined);
+const displaySearchResult = books => {
+
+
+
     searchResult.textContent = '';
 
-
-    if (docs.length === 0) {
+    if (books.numFound === 0) {
         result.innerText = 'No Result Found';
     }
     else {
-        result.innerText = `Total Result: ${docs.length}`;
-
-        docs.forEach(docs => {
-            console.log(docs);
-            const div = document.createElement('div');
-            div.classList.add('col');
-            div.innerHTML = `
-        <div class="card h-100">
-             <img src="https://covers.openlibrary.org/b/id/${docs.cover_i}-M.jpg" class="card-img-top" alt="book-image">
-            <div class="card-body">
-               <h3 class="book-title">Book-Title: ${docs.title}</h3>
-               <h4 class="writer-name">Author-name: ${docs.author_name}</h4>
-               <h5 class="publisher">Publisher: ${docs.publisher}</h5>    
-               <h5 class="publish-date">Publish-Date: ${docs.first_publish_year}</h5>    
-            </div>
-        </div>
-        `
 
 
-            searchResult.appendChild(div);
-        })
+        result.innerText = `Total Result: ${books.numFound}`;
+        // result.innerText = `Showing Output: ${books.length}`;
+
+        const bookList = books.docs;
+
+        bookList.forEach(book => {
+
+            if (book.cover_i !== undefined && book.author_name !== undefined && book.publisher !== undefined) {
+                const div = document.createElement('div');
+                div.classList.add('col');
+                div.innerHTML = `
+                <div class="card h-100">
+                    <img src="https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg" class="card-img-top" alt="book-image">
+                    <div class="card-body">
+                    <h3 class="book-title">Book-Title: ${book.title}</h3>
+                    <h4 class="writer-name">Author-name: ${book.author_name}</h4>
+                    <h5 class="publisher">Publisher: ${book.publisher}</h5>    
+                    <h5 class="publish-date">Publish-Date: ${book.first_publish_year}</h5>    
+                    </div>
+                </div>
+            `
+                searchResult.appendChild(div);
+            }
+        });
     }
 }
 
